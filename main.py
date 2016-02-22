@@ -24,7 +24,7 @@ def extract_torrents(data):
         links = soup.find("ul", class_="peliculas-box").findAll('li')
         for link in links:
             if link.a is not None:
-                name = ' '.join(link.a.text.split()).replace('Espa', ' Espa')
+                name = ' '.join(link.a.text.split()).replace('Espa', ' Espa').strip()
                 magnet = link.a['href'].replace('descargar/', 'torrent/')
                 size = None
                 seeds = 0  # seeds
@@ -33,10 +33,10 @@ def extract_torrents(data):
                 if filters.verify(name, size):
                     # magnet = common.getlinks(magnet)
                     cont += 1
-                    results.append({"name": name.strip(),
+                    results.append({"name": name,
                                     "uri": magnet,
                                     # "info_hash": info_magnet.hash,
-                                    # "size": size.strip(),
+                                    # "size": size,
                                     # "seeds": sint(seeds),
                                     # "peers": sint(peers),
                                     "language": settings.value.get("language", "es"),
@@ -106,8 +106,16 @@ def search_episode(info):
     return search_general(info)
 
 
+def search_season(info):
+    provider.log.info(info)
+    info["type"] = "show"
+    info["query"] = info['title'].encode('utf-8') + ' %s %s' % (
+        common.season_names[settings.value.get("language", "es")], info['season'])  # define query
+    return search_general(info)
+
+
 # This registers your module for use
-provider.register(search, search_movie, search_episode)
+provider.register(search, search_movie, search_episode, search_season)
 
 del settings
 del browser
