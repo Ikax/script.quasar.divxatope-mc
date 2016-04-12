@@ -58,6 +58,7 @@ def search(query):
 
 
 def search_general(info):
+    info['query'] = filters.safe_name(info['query'])
     info["extra"] = settings.value.get("extra", "")  # add the extra information
     query = filters.type_filtering(info, ' ')  # check type filter and set-up filters.title
     url_search = "%s/buscar/descargas" % settings.value["url_address"]
